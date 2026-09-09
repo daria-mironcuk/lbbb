@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: fastapi_postgres_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-fastapi_labs}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fastapi_labs}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: fastapi_web_app
+    restart: always
+    env_file:
+      - .env
+    # DATABASE_URL рахується автоматично в app/core/config.py
+    # з POSTGRES_USER/PASSWORD/HOST/PORT/DB — тут дублювати не треба,
+    # достатньо переконатись, що POSTGRES_HOST=db в .env
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      # монтуємо лише код застосунку, а не весь проєкт (без .git, .venv тощо)
+      - ./app:/app/app
+    command: >
+      sh -c '
+      if [ "$$APP_RELOAD" = "true" ]; then
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload;
+      else
+        uvicorn app.main:app --host 0.0.0.0 --port 8000;
+      fi
+      '
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
