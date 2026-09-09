@@ -1,0 +1,59 @@
+# === Python Cache & Compiled Files ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# === Environments & Packages ===
+# Poetry сам не створює venv тут, якщо POETRY_VIRTUALENVS_CREATE=false,
+# але лишаємо на випадок локальної розробки без Docker
+.venv/
+venv/
+env/
+ENV/
+poetry.toml
+
+# === Project Configuration & Secrets ===
+# Будь-який .env-файл, крім прикладу — там паролі БД та JWT секрети
+.env
+.env.*
+!.env.example
+
+# === Databases ===
+*.db
+*.sqlite3
+*.sqlite3-journal
+
+# === Testing / Linting / Type-checking cache ===
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# === Build / Distribution ===
+build/
+dist/
+*.egg-info/
+
+# === Logs ===
+*.log
+logs/
+
+# === Docker ===
+# локальні override-файли compose, які не мають потрапляти в репо
+docker-compose.override.yml
+
+# === OS & IDE ===
+Thumbs.db
+Desktop.ini
+.DS_Store
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
